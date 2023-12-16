@@ -40,6 +40,7 @@ body {
 
 .section-title {
     font-size: 40px;
+    font-weight: bolder;
 }
 
 .other-calcs {
@@ -158,7 +159,7 @@ body {
 
 #foods-container {
     display: grid;
-    width: 80%;
+    width: 85%;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(16, 1fr);
     padding: 20px 0;
@@ -177,6 +178,7 @@ body {
     flex-shrink: 0;
     border-radius: 10px;
     background-position: bottom;
+    transition: 0.2s ease;
 }
 
 .food-name {
@@ -261,7 +263,7 @@ body {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    width: 80%;
+    width: 85%;
 }
 
 
@@ -277,7 +279,29 @@ body {
     z-index: 100;
 }
 
+#final-solution-container {
+    display: none;
+}
+
+#show-solution-btn {
+    display: block;
+    margin: 5px auto;
+    padding: 10px 20px;
+    border: 1px solid #eee;
+    background-color: #333;
+    color: #eee;
+    font-family: Poppins, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 60%;
+}
+
 #diet-results-container {
+    display: none;
+}
+
+#diet-results {
     display: none;
 }
 
@@ -302,6 +326,7 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    padding: 2.5px 0;
 }
 
 .tableau {
@@ -335,6 +360,22 @@ body {
     border-left: 5px solid #999;
 }
 
+.simplex-table .pivot-highlight {
+    background-color: #eee1;
+}
+
+.simplex-table .pivot {
+    background-color: #eee4;
+}
+
+.iteration-number {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.iteration-container {
+    padding-top: 20px; 
+}
 
 * {
     box-sizing: border-box;

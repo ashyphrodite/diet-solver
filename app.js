@@ -127,11 +127,17 @@ async function main() {
 main();
 
 window.updateFoodList = function() {
+    document.getElementById('diet-results-container').style.display = 'none';
+
     let checkboxes = document.getElementsByClassName('food-checkbox');
     let foodList = document.getElementById('foods-list');
     foodList.innerHTML = '';
 
     selectedFoods = [];
+
+    let submitButton = document.getElementById('solve-btn');
+    submitButton.style.color = '';
+    submitButton.value = 'Solve';
 
     for (let i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
@@ -145,9 +151,20 @@ window.updateFoodList = function() {
     }
 }
 
+window.showSolution = function() {
+    document.getElementById('diet-results').style.display = 'block';
+    document.getElementById('diet-results').scrollIntoView({behavior: 'smooth'});
+}
+
 window.solveDiet = function() {
+    document.getElementById('diet-results').style.display = 'none';
+
     if (selectedFoods.length === 0) {
-        alert('Please select at least one food.');
+        let submitButton = document.getElementById('solve-btn');
+        submitButton.style.color = 'crimson';
+        submitButton.value = 'Please select at least one food!';
+
+        document.getElementById("diet-results-container").style.display = "none";
         return;
     }
 
@@ -224,49 +241,127 @@ window.solveDiet = function() {
 
     cons.appendChild(maxServings);
     cons.appendChild(minServings);
-
-    // scroll down to the results
-    document.getElementById('diet-results-container').style.display = 'block';
-    document.getElementById('diet-results').scrollIntoView({behavior: 'smooth', block: 'start'});
-
     // end of summary **********************************************************
 
     // print initial tableau ***************************************************
-    let table = simplex.tabulize().data;
+    let table = simplex.tabulize();
     
-    let initial = JSON.parse(JSON.stringify(table));
-    console.log(initial);
+    let initial = JSON.parse(JSON.stringify(table.data));
 
     let initialTableContainer = document.getElementById('initial-tableau');
     initialTableContainer.innerHTML = '';
 
-    // generate the table
+    printTable(simplex, initial, initialTableContainer, -1, -1, 1);
+    // end of initial tableau *************************************************
+
+    // per iteration solution *************************************************
+    let itersContainer = document.getElementById('iterations-solution-container');
+    itersContainer.innerHTML = '';
+    let iteration = 0;
+
+    let num_constraints = table.rows;
+    let num_rows = table.rows;
+    let num_cols = table.cols;
+
+    while (true) {
+        let iterContain = document.createElement('div');
+        iterContain.className = 'iteration-container';
+
+        // iteration number header
+        let iterNum = document.createElement('div');
+        iterNum.className = 'iteration-number';
+        iterNum.innerHTML = 'Iteration ' + ++iteration;
+        iterContain.appendChild(iterNum);
+
+        let mat = table.data;
+
+        // find pivot column
+        let pivotCol = -1;
+        let highestNeg = 0;
+        for (let i = 0; i < num_cols - 1; i++) {
+            if (mat[num_rows - 1][i] < highestNeg) {
+                highestNeg = mat[num_rows - 1][i];
+                pivotCol = i;
+            }
+        }
+
+        // if no negative values, break. optimal solution found
+        if (pivotCol === -1) {
+            break;
+        }
+
+        // find pivot row
+        let pivotRow = -1;
+        let lowestRatio = Infinity;
+        for (let i = 0; i < num_rows - 1; i++) {
+            if (mat[i][pivotCol] > 0) {
+                let ratio = mat[i][num_cols - 1] / mat[i][pivotCol];
+                if (ratio < lowestRatio) {
+                    lowestRatio = ratio;
+                    pivotRow = i;
+                }
+            }
+        }
+
+        // if no pivot row found, the problem is infeasible
+        if (pivotRow === -1) {
+            console.log("Problem infeasible!");
+            break;
+        }
+
+        let tableContainer1 = document.createElement('div');
+        tableContainer1.className = 'tableau';
+        printTable(simplex, table.data, tableContainer1, pivotRow, pivotCol, 1);
+
+        table.pivot(pivotRow, pivotCol);
+
+        let tableContainer2 = document.createElement('div');
+        tableContainer2.className = 'tableau';
+        printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 2);
+
+        // append the two tables
+        iterContain.appendChild(tableContainer1);
+        iterContain.appendChild(tableContainer2);
+
+        itersContainer.appendChild(iterContain);
+    }
+
+    document.getElementById('diet-results-container').style.display = 'block';
+    document.getElementById('final-solution-container').style.display = 'block';
+    document.getElementById('final-solution-container').scrollIntoView({behavior: 'smooth'});
+}
+
+function printTable(simplex, table, container, pivotRow, pivotCol, mode) {
+    // Clear the container
+    container.innerHTML = '';
+
+    // Generate the table
     let tableElement = document.createElement('table');
     tableElement.className = 'simplex-table';
 
-    // create a row for the headers
+    // Create a row for the headers
     let headerRow = document.createElement('tr');
 
-    // add the S headers
+    // Add the S headers
     for (let i = 1; i <= simplex.length; i++) {
         let headerCell = document.createElement('th');
         headerCell.innerHTML = 'S' + '<sub>' + i + '</sub>';
         headerRow.appendChild(headerCell);
     }
 
-    // add the x headers
+    // Add the x headers
     for (let i = 1; i <= selectedFoods.length; i++) {
         let headerCell = document.createElement('th');
         headerCell.innerHTML = 'x' + '<sub>' + i + '</sub>';
         headerRow.appendChild(headerCell);
     }
 
-    // add the Z header
+    // Add the Z header
     let headerCell = document.createElement('th');
     headerCell.innerHTML = 'Z';
     headerRow.appendChild(headerCell);
 
-    // add the Solution header
+    // Add the Solution header
     headerCell = document.createElement('th');
     headerCell.innerHTML = 'Solution';
     headerRow.appendChild(headerCell);
@@ -274,16 +369,40 @@ window.solveDiet = function() {
     // Add the header row to the table
     tableElement.appendChild(headerRow);
 
-    for (let i = 0; i < initial.length; i++) {
+    // Add rows and cells to the table
+    for (let i = 0; i < table.length; i++) {
         let row = document.createElement('tr');
 
-        for (let j = 0; j < initial[i].length; j++) {
+        for (let j = 0; j < table[i].length; j++) {
             let cell = document.createElement('td');
-            // if initial[i][j] < 0.001. just print < 0.001
-            if (Math.abs(initial[i][j]) < 0.001 && initial[i][j] !== 0) {
-                cell.textContent = '< 0.001';
+
+            // highlight the pivot row and column
+            switch (mode) {
+                case 0:
+                    // Don't apply the class name
+                    break;
+                case 1:
+                    // Apply both 'pivot-highlight' and 'pivot' class names
+                    if (i === pivotRow && j === pivotCol) {
+                        cell.className = 'pivot';
+                    }
+                    else if (i === pivotRow || j === pivotCol) {
+                        cell.className = 'pivot-highlight';
+                    }
+                    break;
+                case 2:
+                    // Apply only the 'pivot' class name
+                    if (i === pivotRow && j === pivotCol) {
+                        cell.className = 'pivot';
+                    }
+                    break;
+            }
+
+            // if table[i][j] < 0.001. just print < 0.001
+            if (Math.abs(table[i][j]) < 0.0001 && table[i][j] !== 0) {
+                cell.textContent = table[i][j] < 0 ? '-0.0000...' : '0.0000...';
             } else {
-                cell.textContent = Number(initial[i][j].toFixed(3));
+                cell.textContent = Number(table[i][j].toFixed(3));
             }
             row.appendChild(cell);
         }
@@ -291,10 +410,9 @@ window.solveDiet = function() {
         tableElement.appendChild(row);
     }
 
-    initialTableContainer.appendChild(tableElement);
-
+    // Add the table to the container
+    container.appendChild(tableElement);
 }
-
 
 // Polynomial Regression functions *****************************************************************
 let polyregPointList;
