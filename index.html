@@ -1,0 +1,163 @@
+<html>
+<head>
+    <title>Diet Solver</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="body-wrap">
+        <div class="body-container">
+            <div id="simplex-container">
+                <div class="section-heading">
+                    <span class="section-title">Diet Solver</span>
+
+                    <span class="other-calcs">
+                        <span class="calc-link" onclick="switchTabs('polyreg-container')">Polynomial Regression</span>
+                        <span class="calc-link" onclick="switchTabs('quadspline-container')">Quadratic Spline Interpolation</span>
+                    </span>
+                </div>
+                <div class="calc-section">
+                    <form id="diet-form">
+                        <div id="foods-container">
+
+                        </div>
+
+                        <div id="foods-list-container">
+                            <div>
+                                <b style="font-size: 18px;">Selected foods:</b>
+                            </div>
+                            <div id="foods-list">
+
+                            </div>
+                        </div>
+                        
+                        <input type="submit" value="Solve" id="solve-btn" onclick="solveDiet()">
+                        
+                    </form>
+
+                    <div id="diet-results-container">
+                        <div id="diet-results">
+                            <div id="simplex-summary">
+                                <div class="simplex-summary-header">
+                                    <b>Minimize</b>
+                                </div>
+                                <div id="objective-function" class="summary-equation">
+
+                                </div>
+                                <div class="simplex-summary-header">
+                                    <b>Subject to</b>
+                                </div>
+                                <div id="constraints">
+
+                                </div>
+                            </div>
+                            <div id="initial-tableau-container">
+                                <div class="tableu-header">
+                                    <b>Initial Tableau</b>
+                                </div>
+                                <div id="initial-tableau" class="tableau">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loading-container">
+                        <div id="loading">
+                            Solving ...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="polyreg-container">
+                <div class="section-heading">
+                    <span class="section-title">Polynomial Regression</span>
+
+                    <span class="other-calcs">
+                        <span class="calc-link" onclick="switchTabs('simplex-container')">Diet Solver</span>
+                        <span class="calc-link" onclick="switchTabs('quadspline-container')">Quadratic Spline Interpolation</span>
+                    </span>
+                </div>
+                <div class="calc-section">
+                    <div class="file-input-container">
+                        <input type="file" id="csvFilePolyreg" accept=".csv" style="display: none;" onchange="readPolyregFile(event)">
+                        <label for="csvFilePolyreg" class="file-upload">Upload CSV File</label>
+                    </div>
+                    <div class="polyreg-table-container table-container">
+
+                    </div>
+                    
+                    <div class="polyreg-results-container results-container">
+                        <div class="degree-container">
+                            <span>Enter degree: </span>
+                            <input type="number" id="polyregdegree" step="1" value="1" min="0" onchange="updatePolyregInput()">
+                        </div>
+                        <div class="polyreg-fn">
+                            <span id="polyreg-fn">f(x) =</span>
+                            <span id="polyreg-fn-value"></span>
+                        </div>
+                        <div class="polyreg-enter-x">
+                            <span>Enter x:</span>
+                            <input type="number" id="polyreg-x" onchange="updatePolyregInput()">
+                        </div>
+                        <div class="polyreg-fn-result">
+                            <span>f(</span><span id="polyreg-x-value"></span><span>) = </span><span id="polyreg-fn-result-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quadspline-container">
+                <div class="section-heading">
+                    <span class="section-title">Quadratic Spline Interpolation</span>
+
+                    <span class="other-calcs">
+                        <span class="calc-link" onclick="switchTabs('simplex-container')">Diet Solver</span>
+                        <span class="calc-link" onclick="switchTabs('polyreg-container')">Polynomial Regression</span>
+                    </span>
+                </div>
+                <div class="calc-section">
+                    <div class="file-input-container">
+                        <input type="file" id="csvFileQuadspline" accept=".csv" style="display: none;" onchange="readQuadsplineFile(event)">
+                        <label for="csvFileQuadspline" class="file-upload">Upload CSV File</label>
+                    </div>
+
+                    <div class="quadspline-table-container table-container">
+                    
+                    </div>
+
+                    <div class="quadspline-results-container results-container">
+                        <div class="quadspline-fn">
+                            <span style="display: flex; align-items: center; padding-right: 5px;">f(x) = </span>
+                            <span id="quadspline-fn-value">
+
+                            </span>
+                            <span id="quadspline-fn-bounds">
+
+                            </span>
+                        </div>
+
+                        <div class="quadspline-enter-x">
+                            <span>Enter x:</span>
+                            <input type="number" id="quadspline-x" onchange="updateQuadsplineInput()">
+                        </div>
+                        <div class="quadspline-selected-fn">
+                            <span>f(x) = </span><span id="quadspline-selected-fn-value"></span>
+                        </div>
+                        <div class="quadspline-fn-result">
+                            <span>f(</span><span id="quadspline-x-value"></span><span>) = </span><span id="quadspline-fn-result-value"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="footer">
+
+        </div>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
