@@ -103,15 +103,18 @@ async function main() {
     for (let i = 0; i < checkboxes.length; i++) {
         checkboxes[i].addEventListener('change', function() {
             let square = this.parentElement;
-            let label = square.nextElementSibling;  
+            let label = square.nextElementSibling;
+            let container = square.parentElement;
             if (this.checked) {
                 square.style.borderColor = 'lawngreen';
-                square.style.backgroundColor = 'lawngreen';
+                square.style.backgroundColor = '#00ff0066'
                 label.style.color = 'lawngreen';
+                container.style.backgroundColor = '#00ff0044';
             } else {
-                square.style.border = ''; // reset to default
-                square.style.backgroundColor = ''; // reset to default
-                label.style.color = ''; // reset to default 
+                square.style.border = '';
+                square.style.backgroundColor = '';
+                label.style.color = '';
+                container.style.backgroundColor = '';
             }
         });
     }
