@@ -390,7 +390,7 @@ window.solveDiet = function() {
         }
     }
 
-    // print the final solution
+    // print the final solution 
     let finalSolution = document.getElementById('final-solution');
     finalSolution.innerHTML = '';
 
@@ -401,7 +401,7 @@ window.solveDiet = function() {
         finalSolution.appendChild(infeasible);
     } else {
         let finalSolutionHeader = document.createElement('div');
-        finalSolutionHeader.className = 'basic-solution-header';
+        finalSolutionHeader.className = 'final-solution-header';
         finalSolutionHeader.innerHTML = 'The cost of this <b>optimal</b> diet is <b>$' + table.data[num_rows - 1][num_cols - 1].toFixed(2) + '</b>.';
         finalSolution.appendChild(finalSolutionHeader);
 
@@ -411,7 +411,7 @@ window.solveDiet = function() {
 
         // create a row for the headers
         let headerRow = document.createElement('tr');
-        let headers = ['Food name', 'Servings', 'Cost'];
+        let headers = ['Food name', 'Servings', 'Cost ($)'];
         for (let header of headers) {
             let headerCell = document.createElement('th');
             headerCell.textContent = header;
