@@ -16,15 +16,17 @@ window.switchTabs = function (id) {
 
     // change the page title
     switch(id) {
-        case 'simplex-container':
+        case 'simplex-container': {
             document.title = 'Diet Solver';
-            break;
-        case 'polyreg-container':
+        } break;
+        case 'polyreg-container': {
+            document.getElementById('diet-results').style.display = 'none';
             document.title = 'Polynomial Regression';
-            break;
-        case 'quadspline-container':
+        } break;
+        case 'quadspline-container': {
+            document.getElementById('diet-results').style.display = 'none';
             document.title = 'Quadratic Spline Interpolation';
-            break;
+        } break;
     }
 }
 
@@ -151,6 +153,15 @@ window.updateFoodList = function() {
     }
 }
 
+window.resetSelection = function() {
+    let checkboxes = document.getElementsByClassName('food-checkbox');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+        checkboxes[i].dispatchEvent(new Event('change'));
+    }
+    selectedFoods = [];
+}
+
 window.showSolution = function() {
     document.getElementById('diet-results').style.display = 'block';
     document.getElementById('diet-results').scrollIntoView({behavior: 'smooth'});
@@ -263,6 +274,7 @@ window.solveDiet = function() {
     let num_rows = table.rows;
     let num_cols = table.cols;
 
+    
     while (true) {
         let iterContain = document.createElement('div');
         iterContain.className = 'iteration-container';
@@ -319,9 +331,47 @@ window.solveDiet = function() {
         tableContainer2.className = 'tableau';
         printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 2);
 
+        // add the basic solution table
+        
+        // create a 1 by cols - 1 matrix
+        let basicMat = new Matrix(1, num_cols - 1);
+
+        // get the basic solution from table
+        for (let j = 0; j < num_cols - 1; j++) {
+            let isBasic = true;
+            let oneIndex = -1;
+
+            for (let i = 0; i < num_rows; i++) {
+                if (mat[i][j] === 1 && oneIndex === -1) {
+                    oneIndex = i;
+                } else if (mat[i][j] !== 0) {
+                    isBasic = false;
+                    break;
+                }
+            }
+
+            if (isBasic && oneIndex !== -1) {
+                basicMat.data[0][j] = table.data[oneIndex][num_cols - 1];
+            } else {
+                basicMat.data[0][j] = 0;
+            }
+        }
+
+        // add basic solution Header
+        let basicSolutionHeader = document.createElement('div');
+        basicSolutionHeader.className = 'basic-solution-header';
+        basicSolutionHeader.innerHTML = 'Basic Feasible Solution';
+
+        let basicSolution = document.createElement('div');
+        basicSolution.className = 'basic-solution';
+        printBasicSolutionTable(simplex, basicMat.data, basicSolution);
+
+
         // append the two tables
         iterContain.appendChild(tableContainer1);
-        iterContain.appendChild(tableContainer2);
+        iterContain.appendChild(tableContainer2); 
+        iterContain.appendChild(basicSolutionHeader);
+        iterContain.appendChild(basicSolution);
 
         itersContainer.appendChild(iterContain);
     }
@@ -402,8 +452,57 @@ function printTable(simplex, table, container, pivotRow, pivotCol, mode) {
             if (Math.abs(table[i][j]) < 0.0001 && table[i][j] !== 0) {
                 cell.textContent = table[i][j] < 0 ? '-0.0000...' : '0.0000...';
             } else {
-                cell.textContent = Number(table[i][j].toFixed(3));
+                cell.textContent = Number(table[i][j].toFixed(4));
             }
+            row.appendChild(cell);
+        }
+
+        tableElement.appendChild(row);
+    }
+
+    // Add the table to the container
+    container.appendChild(tableElement);
+}
+
+function printBasicSolutionTable(simplex, data, container) {
+    // Clear the container
+    container.innerHTML = '';
+
+    // Generate the table
+    let tableElement = document.createElement('table');
+    tableElement.className = 'basic-solution-table';
+
+    // Create a row for the headers
+    let headerRow = document.createElement('tr');
+
+    // Add the S headers
+    for (let i = 1; i <= simplex.length; i++) {
+        let headerCell = document.createElement('td');
+        headerCell.innerHTML = 'S' + '<sub>' + i + '</sub>';
+        headerRow.appendChild(headerCell);
+    }
+
+    // Add the x headers
+    for (let i = 1; i <= selectedFoods.length; i++) {
+        let headerCell = document.createElement('td');
+        headerCell.innerHTML = 'x' + '<sub>' + i + '</sub>';
+        headerRow.appendChild(headerCell);
+    }
+
+    let headerCell = document.createElement('td');
+    headerCell.innerHTML = 'Z';
+    headerRow.appendChild(headerCell);
+
+    // Add the header row to the table
+    tableElement.appendChild(headerRow);
+
+    // Add rows and cells to the table
+    for (let i = 0; i < data.length; i++) {
+        let row = document.createElement('tr');
+
+        for (let j = 0; j < data[i].length; j++) {
+            let cell = document.createElement('td');
+            cell.textContent = Number(data[i][j].toFixed(4));
             row.appendChild(cell);
         }
 
@@ -447,7 +546,8 @@ window.readPolyregFile = (event) => {
         document.getElementById('polyregdegree').setAttribute('max', polyregPointList.points.length - 1);
         document.getElementById('polyreg-x').value = polyregPointList.points[0].x;
 
-        updatePolyregValues();
+        calculatePolyregSolution();
+        updateYValue();
     };
 
     reader.readAsText(file);
@@ -485,16 +585,17 @@ function generatePolyregTable(pointList) {
     tableContainer.appendChild(table);
 }
 
-function updatePolyregValues() {
-    // get the degree
+function calculatePolyregSolution() {
+    // Get the degree
     const degreeInput = document.getElementById('polyregdegree');
     const degreeValue = Number(degreeInput.value);
 
-    if (degreeValue > polyregPointList.points.length - 1
-        || degreeValue < 0
-        || Math.round(degreeValue) !== degreeValue)
+    // Check the degree value
+    if (degreeValue > polyregPointList.points.length - 1 ||
+        degreeValue < 0 ||
+        Math.round(degreeValue) !== degreeValue)
     {
-        document.getElementById('polyreg-fn-value').textContent = 'Invalid degree!';
+        document.getElementById('polyreg-fn-value').innerHTML = 'Invalid degree!';
         return;
     } 
 
@@ -502,15 +603,12 @@ function updatePolyregValues() {
     const polymat = polyreg.vandermondeMatrix(degreeValue, polyregPointList);
     polymat.gaussJordanMethod();
     polyregSolution = polyreg.getSolution(polymat);
+    console.log(polyregSolution);
 
-    console.log(polyregSolution)
+    updatePolyregFunction();
+}
 
-    // get the x value
-    const xInput = document.getElementById('polyreg-x');    
-    let x_value = Number(xInput.value);
-
-    document.getElementById('polyreg-x-value').textContent = x_value;   // update x in f(x) = y
-
+function updatePolyregFunction() {
     let fn = document.getElementById('polyreg-fn-value');
     // reset the content of fn
     fn.innerHTML = '';
@@ -522,34 +620,50 @@ function updatePolyregValues() {
             // print the signs
             if (i !== 0) {
                 term.innerHTML += polyregSolution.coeffs[i] >= 0 ? " + " : " - ";
-            } else if (polyregSolution.coeffs[i] < 0) {
-                term.innerHTML += "-";
             }
-
-            // increase precision appropriately
-            let precision = Math.max(4, 3 - Math.floor(Math.log10(Math.abs(polyregSolution.coeffs[i]))));
-
-            // format the coefficient to have 4 decimal places
-            term.innerHTML += Math.abs(polyregSolution.coeffs[i]).toFixed(precision);
-            
-            if (i > 0) {
+            // print the coefficient if not 1 or -1
+            if (Math.abs(polyregSolution.coeffs[i]) !== 1 || i === 0) {
+                let precision = Math.max(4, 3 - Math.floor(Math.log10(Math.abs(polyregSolution.coeffs[i]))));
+                term.innerHTML += Math.abs(polyregSolution.coeffs[i]).toFixed(precision);
+            }
+            // print x if not the constant term
+            if (i !== 0) {
                 term.innerHTML += "x";
-                
-                if (i > 1) {
-                    term.innerHTML += `<sup>${i}</sup>`;
-                }
             }
-    
-            fn.appendChild(term);
+            // print the degree if greater than 1
+            if (i > 1) {
+                term.innerHTML += `<sup>${i}</sup>`;
+            }
         }
-    }
 
-    let y_value = polyreg.estimate(polyregSolution, x_value);
-    document.getElementById('polyreg-fn-result-value').textContent = y_value.toFixed(4);   // update y in f(x) = y
+        fn.appendChild(term);
+    }
 }
 
-window.updatePolyregInput = function() {
-    updatePolyregValues();
+function updateYValue() {
+    // Get the x value
+    const xInput = document.getElementById('polyreg-x');    
+    let x_value = Number(xInput.value);
+
+    // calculate the y value
+    let y_value = 0;
+    for (let i = 0; i <= polyregSolution.degree; i++) {
+        y_value += polyregSolution.coeffs[i] * Math.pow(x_value, i);
+    }
+
+    // update the DOM
+    let precision = Math.max(4, 3 - Math.floor(Math.log10(Math.abs(y_value))));
+    document.getElementById('polyreg-fn-result-value').textContent = y_value.toFixed(precision);
+    document.getElementById('polyreg-x-value').innerHTML = x_value;
+}
+
+window.updatePolyregFunction = function() {
+    calculatePolyregSolution();
+    updateYValue();
+}
+
+window.updatePolyregYValue = function() {
+    updateYValue();
 }
 
 // Quadratic Spline Interpolation functions ********************************************************

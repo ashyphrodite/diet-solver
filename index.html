@@ -20,6 +20,9 @@
                 </div>
                 <div class="calc-section">
                     <form id="diet-form">
+                        <div class="reset-selection">
+                            <div class="reset-selection-text" onclick="resetSelection()">Reset Selection</div>
+                        </div>
                         <div id="foods-container">
 
                         </div>
@@ -59,7 +62,7 @@
                                 </div>
                             </div>
                             <div id="initial-tableau-container">
-                                <div class="tableu-header">
+                                <div class="tableu-header iteration-number">
                                     <b>Initial Tableau</b>
                                 </div>
                                 <div id="initial-tableau" class="tableau">
@@ -69,12 +72,6 @@
                             <div id="iterations-solution-container">
                                 
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="loading-container">
-                        <div id="loading">
-                            Solving ...
                         </div>
                     </div>
                 </div>
@@ -101,7 +98,7 @@
                     <div class="polyreg-results-container results-container">
                         <div class="degree-container">
                             <span>Enter degree: </span>
-                            <input type="number" id="polyregdegree" step="1" value="1" min="0" onchange="updatePolyregInput()">
+                            <input type="number" id="polyregdegree" step="1" value="1" min="0" onchange="updatePolyregFunction()">
                         </div>
                         <div class="polyreg-fn">
                             <span id="polyreg-fn">f(x) =</span>
@@ -109,7 +106,7 @@
                         </div>
                         <div class="polyreg-enter-x">
                             <span>Enter x:</span>
-                            <input type="number" id="polyreg-x" onchange="updatePolyregInput()">
+                            <input type="number" id="polyreg-x" onchange="updatePolyregYValue()">
                         </div>
                         <div class="polyreg-fn-result">
                             <span>f(</span><span id="polyreg-x-value"></span><span>) = </span><span id="polyreg-fn-result-value"></span>
