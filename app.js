@@ -273,7 +273,8 @@ window.solveDiet = function() {
     let num_constraints = table.rows;
     let num_rows = table.rows;
     let num_cols = table.cols;
-
+    let isInfeasible = false;
+    let isOptimal = false;
     
     while (true) {
         let iterContain = document.createElement('div');
@@ -299,6 +300,7 @@ window.solveDiet = function() {
 
         // if no negative values, break. optimal solution found
         if (pivotCol === -1) {
+            isInfeasible = false;
             break;
         }
 
@@ -318,67 +320,132 @@ window.solveDiet = function() {
         // if no pivot row found, the problem is infeasible
         if (pivotRow === -1) {
             console.log("Problem infeasible!");
-            break;
+            isInfeasible = true;
         }
 
         let tableContainer1 = document.createElement('div');
         tableContainer1.className = 'tableau';
         printTable(simplex, table.data, tableContainer1, pivotRow, pivotCol, 1);
-
-        table.pivot(pivotRow, pivotCol);
-
-        let tableContainer2 = document.createElement('div');
-        tableContainer2.className = 'tableau';
-        printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 2);
-
-        // add the basic solution table
         
-        // create a 1 by cols - 1 matrix
-        let basicMat = new Matrix(1, num_cols - 1);
+        iterContain.appendChild(tableContainer1);
 
-        // get the basic solution from table
-        for (let j = 0; j < num_cols - 1; j++) {
-            let isBasic = true;
-            let oneIndex = -1;
+        if (isInfeasible == false) {
+            table.pivot(pivotRow, pivotCol);
 
-            for (let i = 0; i < num_rows; i++) {
-                if (mat[i][j] === 1 && oneIndex === -1) {
-                    oneIndex = i;
-                } else if (mat[i][j] !== 0) {
-                    isBasic = false;
-                    break;
+            let tableContainer2 = document.createElement('div');
+            tableContainer2.className = 'tableau';
+            printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 2);
+
+            // add the basic solution table
+            
+            // create a 1 by cols - 1 matrix
+            var basicMat = new Matrix(1, num_cols - 1);
+
+            // get the basic solution from table
+            for (let j = 0; j < num_cols - 1; j++) {
+                let isBasic = true;
+                let oneIndex = -1;
+
+                for (let i = 0; i < num_rows; i++) {
+                    if (mat[i][j] === 1 && oneIndex === -1) {
+                        oneIndex = i;
+                    } else if (mat[i][j] !== 0) {
+                        isBasic = false;
+                        break;
+                    }
+                }
+
+                if (isBasic && oneIndex !== -1) {
+                    basicMat.data[0][j] = table.data[oneIndex][num_cols - 1];
+                } else {
+                    basicMat.data[0][j] = 0;
                 }
             }
 
-            if (isBasic && oneIndex !== -1) {
-                basicMat.data[0][j] = table.data[oneIndex][num_cols - 1];
-            } else {
-                basicMat.data[0][j] = 0;
+            // add basic solution Header
+            let basicSolutionHeader = document.createElement('div');
+            basicSolutionHeader.className = 'basic-solution-header';
+            basicSolutionHeader.innerHTML = 'Basic Feasible Solution';
+
+            let basicSolution = document.createElement('div');
+            basicSolution.className = 'basic-solution';
+            printBasicSolutionTable(simplex, basicMat.data, basicSolution);
+
+            // append the table2
+            iterContain.appendChild(tableContainer2); 
+            iterContain.appendChild(basicSolutionHeader);
+            iterContain.appendChild(basicSolution);
+
+            itersContainer.appendChild(iterContain);
+        }
+        else {
+            // add the infeasible message
+            let infeasible = document.createElement('div');
+            infeasible.className = 'infeasible';
+            infeasible.innerHTML = 'The problem is infeasible!';
+            iterContain.appendChild(infeasible);
+
+            itersContainer.appendChild(iterContain);
+            break;
+        }
+    }
+
+    // print the final solution
+    let finalSolution = document.getElementById('final-solution');
+    finalSolution.innerHTML = '';
+
+    if (isInfeasible) {
+        let infeasible = document.createElement('div');
+        infeasible.className = 'infeasible';
+        infeasible.innerHTML = 'The problem is infeasible!';
+        finalSolution.appendChild(infeasible);
+    } else {
+        let finalSolutionHeader = document.createElement('div');
+        finalSolutionHeader.className = 'basic-solution-header';
+        finalSolutionHeader.innerHTML = 'The cost of this <b>optimal</b> diet is <b>$' + table.data[num_rows - 1][num_cols - 1].toFixed(2) + '</b>.';
+        finalSolution.appendChild(finalSolutionHeader);
+
+
+        let finalSolutionTable = document.createElement('table');
+        finalSolutionTable.className = 'final-solution-table';
+
+        // create a row for the headers
+        let headerRow = document.createElement('tr');
+        let headers = ['Food name', 'Servings', 'Cost'];
+        for (let header of headers) {
+            let headerCell = document.createElement('th');
+            headerCell.textContent = header;
+            headerRow.appendChild(headerCell);
+        }
+        finalSolutionTable.appendChild(headerRow);
+
+        // add rows and cells to the table
+        for (let i = 0; i < selectedFoods.length; i++) {
+            if (basicMat.data[0][i + simplex.length] !== 0) {
+                let row = document.createElement('tr');
+
+                let nameCell = document.createElement('td');
+                nameCell.textContent = foods[selectedFoods[i]].foodName;
+                row.appendChild(nameCell);
+
+                let servingsCell = document.createElement('td');
+                servingsCell.textContent = basicMat.data[0][i + simplex.length].toFixed(2);
+                row.appendChild(servingsCell);
+
+                let costCell = document.createElement('td');
+                costCell.textContent = (basicMat.data[0][i + simplex.length] * foods[selectedFoods[i]].price).toFixed(3);
+                row.appendChild(costCell);
+
+                finalSolutionTable.appendChild(row);
             }
         }
 
-        // add basic solution Header
-        let basicSolutionHeader = document.createElement('div');
-        basicSolutionHeader.className = 'basic-solution-header';
-        basicSolutionHeader.innerHTML = 'Basic Feasible Solution';
-
-        let basicSolution = document.createElement('div');
-        basicSolution.className = 'basic-solution';
-        printBasicSolutionTable(simplex, basicMat.data, basicSolution);
-
-
-        // append the two tables
-        iterContain.appendChild(tableContainer1);
-        iterContain.appendChild(tableContainer2); 
-        iterContain.appendChild(basicSolutionHeader);
-        iterContain.appendChild(basicSolution);
-
-        itersContainer.appendChild(iterContain);
+        finalSolution.appendChild(finalSolutionTable);
     }
 
     document.getElementById('diet-results-container').style.display = 'block';
     document.getElementById('final-solution-container').style.display = 'block';
-    document.getElementById('final-solution-container').scrollIntoView({behavior: 'smooth'});
+    document.getElementById('final-solution').scrollIntoView({behavior: 'smooth'});
 }
 
 function printTable(simplex, table, container, pivotRow, pivotCol, mode) {
@@ -959,7 +1026,8 @@ function updateQuadsplineValues() {
     let y_value = quadsplineSolution.evaluate(x_value);
 
     // update y in f(x) = y
-    resultContainer.innerHTML = y_value.toFixed(4);
+    let precision = Math.max(6, 1 - Math.floor(Math.log10(Math.abs(y_value))));
+    resultContainer.innerHTML = y_value.toFixed(precision);
 }
 
 window.updateQuadsplineInput = function() {

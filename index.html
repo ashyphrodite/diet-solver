@@ -19,7 +19,7 @@
                     </span>
                 </div>
                 <div class="calc-section">
-                    <form id="diet-form">
+                    <div id="diet-form">
                         <div class="reset-selection">
                             <div class="reset-selection-text" onclick="resetSelection()">Reset Selection</div>
                         </div>
@@ -38,10 +38,13 @@
                         
                         <input type="submit" value="Solve" id="solve-btn" onclick="solveDiet()">
                         
-                    </form>
+                    </div>
 
                     <div id="diet-results-container">
                         <div id="final-solution-container">
+                            <div id="final-solution">
+
+                            </div>
 
                             <input type="submit" value="Show Solution" id="show-solution-btn" onclick="showSolution()">
                         </div>

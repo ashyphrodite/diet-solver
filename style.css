@@ -414,6 +414,38 @@ body {
     outline: 1px solid #333;
 }
 
+.infeasible {
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+    font-weight: bold;
+    color: red;
+}
+
+#final-solution {
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.final-solution-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding-top: 10px;
+    width: 50%;
+}
+
+.final-solution-table td {
+    padding: 0 10px;
+    outline: 1px solid #333;
+}
+
+.final-solution-table td:not(:first-child) {
+    text-align: center;
+}
+
 * {
     box-sizing: border-box;
 }
