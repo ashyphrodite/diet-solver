@@ -398,6 +398,7 @@ window.solveDiet = function() {
         }
     }
 
+
     // print the final solution 
     let finalSolution = document.getElementById('final-solution');
     finalSolution.innerHTML = '';
@@ -452,6 +453,66 @@ window.solveDiet = function() {
         }
 
         finalSolution.appendChild(finalSolutionTable);
+
+        let iterContain = document.createElement('div');
+        iterContain.className = 'iteration-container';
+
+        let basicContainer = document.createElement('div');
+        basicContainer.className = 'basic-solution';
+
+        let basicSolutionHeader = document.createElement('div');
+        basicSolutionHeader.className = 'basic-solution-header';
+        basicSolutionHeader.innerHTML = 'Final Solution';
+
+        // add the final solution table which is the last row after the last iteration
+        let finalSolutionTable2 = document.createElement('table');
+        finalSolutionTable2.className = 'basic-solution-table';
+
+        let lastRow = table.data[table.data.length - 1];
+        // header row
+        headerRow = document.createElement('tr');
+
+        // add the S headers
+        for (let i = 1; i <= simplex.length; i++) {
+            let headerCell = document.createElement('td');
+            headerCell.innerHTML = 'S' + '<sub>' + i + '</sub>';
+            headerRow.appendChild(headerCell);
+        }
+
+        // add the x headers
+        for (let i = 1; i <= selectedFoods.length; i++) {
+            let headerCell = document.createElement('td');
+            headerCell.innerHTML = 'x' + '<sub>' + i + '</sub>';
+            headerRow.appendChild(headerCell);
+        }
+
+        // add the Z header
+        let headerCell = document.createElement('td');
+        headerCell.innerHTML = 'Z';
+        headerRow.appendChild(headerCell);
+
+        // add the row to the table
+        finalSolutionTable2.appendChild(headerRow);
+
+        // add the last row to the table (except the solution)
+        let row = document.createElement('tr');
+        for (let i = 0; i < lastRow.length - 2; i++) {
+            let cell = document.createElement('td');
+            cell.textContent = Number(lastRow[i].toFixed(4));
+            row.appendChild(cell);
+        }
+        // last value of the last row is the Z
+        let cell = document.createElement('td');
+        cell.textContent = Number(lastRow[lastRow.length - 1].toFixed(4));
+        row.appendChild(cell);
+        
+        finalSolutionTable2.appendChild(row);
+
+        // add the table to the container
+        basicContainer.appendChild(finalSolutionTable2);
+        iterContain.appendChild(basicSolutionHeader);
+        iterContain.appendChild(basicContainer);
+        itersContainer.appendChild(iterContain);
     }
 
     document.getElementById('diet-results-container').style.display = 'block';
