@@ -372,7 +372,6 @@ class SimplexV2 {
     
         // Phase 2: Solve the actual problem
         while (true) {
-
             // find the pivot column - the most negative entry in the bottom row
             let pivot_col = -1;
             let highest_neg = 0.0;
@@ -384,7 +383,7 @@ class SimplexV2 {
             }
     
             // If all objective coefficients are non-negative, the optimal solution has been found
-            if (highest_neg >= 0.0) {
+            if (pivot_col === -1) {
                 break;
             }
     

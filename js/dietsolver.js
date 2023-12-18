@@ -1,5 +1,4 @@
-import { Food } from './utils.js'
-import { Objective, Constraint, Simplex, SimplexV2 } from './simplex.js';
+import { Objective, Constraint, SimplexV2 } from './simplex.js';
 
 const MIN_CALORIES = 2000;
 const MIN_CHOLESTEROL = 0;

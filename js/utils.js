@@ -1,5 +1,3 @@
-const EPSILON = 1e-14;
-
 class Point {
     constructor(x, y) {
         this.x = x;
@@ -46,8 +44,13 @@ class PointList {
     }
 
     sortPoints() {
-        this.points.sort((a, b) => a.x - b.x);
-    }
+		this.points.sort((a, b) => {
+			if (a.x === b.x) {
+				return a.y - b.y;
+			}
+			return a.x - b.x;
+		});
+	}
 }
 
 class Polynomial {
@@ -99,7 +102,7 @@ class Matrix {
             if (round(this.data[row_i][i], 10) == num) {
                 this.data[row_i][i] = num;
             }
-   		 }
+		}
 	}
 
 	columnSwap(col_i, col_j) {

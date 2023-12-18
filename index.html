@@ -9,6 +9,9 @@
 <body>
     <div class="body-wrap">
         <div class="body-container">
+            <div id="guide-container">
+                <div class="user-guide-text" onclick="window.open('user_guide.pdf', '_blank')">Download the user guide (pdf)</div>
+            </div>
             <div id="simplex-container">
                 <div class="section-heading">
                     <span class="section-title">Diet Solver</span>
@@ -112,7 +115,7 @@
                             <input type="number" id="polyreg-x" onchange="updatePolyregYValue()">
                         </div>
                         <div class="polyreg-fn-result">
-                            <span>f(</span><span id="polyreg-x-value"></span><span>) =</span><span id="polyreg-fn-result-value"></span>
+                            <span>f(</span><span id="polyreg-x-value"></span><span>) =&nbsp;</span><span id="polyreg-fn-result-value"></span>
                         </div>
                     </div>
                 </div>
@@ -137,7 +140,7 @@
                     
                     </div>
 
-                    <div class="quadspline-results-container results-container">
+                    <div class="results-container" id="quadspline-results-container">
                         <div class="quadspline-fn">
                             <span style="display: flex; align-items: center; padding-right: 5px;">f(x) = </span>
                             <span id="quadspline-fn-value">

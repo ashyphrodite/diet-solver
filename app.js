@@ -1,7 +1,6 @@
-import { Point, PointList, Polynomial, Matrix, Food } from './js/utils.js';
+import { Point, PointList, Matrix, Food } from './js/utils.js';
 import { QSSolution, QSparse } from './js/quadspline.js';
 import * as polyreg from './js/polyreg.js';
-import { Objective, Constraint, Simplex, SimplexV2 } from './js/simplex.js';
 import * as dietsolver from './js/dietsolver.js';
 
 
@@ -95,7 +94,7 @@ async function main() {
         aFood.appendChild(label);
         container.appendChild(aFood);
 
-        if (i => 63) {
+        if (i >= 63) {
             document.getElementById('simplex-container').style.display = 'block';
         }
     }
@@ -270,13 +269,11 @@ window.solveDiet = function() {
     itersContainer.innerHTML = '';
     let iteration = 0;
 
-    let num_constraints = table.rows;
     let num_rows = table.rows;
     let num_cols = table.cols;
     let isInfeasible = false;
-    let isOptimal = false;
     
-    while (true) {
+    for (;;) {
         let iterContain = document.createElement('div');
         iterContain.className = 'iteration-container';
 
@@ -334,7 +331,7 @@ window.solveDiet = function() {
 
             let tableContainer2 = document.createElement('div');
             tableContainer2.className = 'tableau';
-            printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 2);
+            printTable(simplex, table.data, tableContainer2, pivotRow, pivotCol, 1);
 
             // add the basic solution table
             
@@ -775,6 +772,8 @@ window.readQuadsplineFile = (event) => {
                 tableContainer.innerHTML += dupe + ' ';
             }
 
+            document.getElementById('quadspline-results-container').style.display = 'none';
+
             return;
         }
 
@@ -782,7 +781,7 @@ window.readQuadsplineFile = (event) => {
 
         generateQuadsplineTable(quadsplinePointList);
 
-        document.getElementsByClassName('quadspline-results-container')[0].style.display = 'flex';
+        document.getElementById('quadspline-results-container').style.display = 'flex';
 
         computeQuadspline(quadsplinePointList);
     };
