@@ -40,7 +40,8 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	align-items: center; 
+	align-items: center;
+    flex-direction: column;
 }
 
 .body-container {
@@ -181,15 +182,26 @@ body {
 
 
 /* Simplex */
-.reset-selection {
+.selection-text-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
     padding: 20px 0;
+    width: 70%;
 }
 
-.reset-selection:hover {
+.select-text {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.selection-text:hover {
     color: #bbb;
 }
 
-.reset-selection-text {
+.selection-text {
     font-size: 18px;
     cursor: pointer;
 }

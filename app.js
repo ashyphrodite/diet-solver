@@ -161,6 +161,17 @@ window.resetSelection = function() {
     selectedFoods = [];
 }
 
+window.selectAll = function() {
+    let checkboxes = document.querySelectorAll('.food-checkbox');
+
+    selectedFoods = [];
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+        checkboxes[i].dispatchEvent(new Event('change'));
+        selectedFoods.push(checkboxes[i].id);
+    }
+}
+
 window.showSolution = function() {
     document.getElementById('diet-results').style.display = 'block';
     document.getElementById('diet-results').scrollIntoView({behavior: 'smooth'});
@@ -418,7 +429,8 @@ window.solveDiet = function() {
 
         // add rows and cells to the table
         for (let i = 0; i < selectedFoods.length; i++) {
-            if (basicMat.data[0][i + simplex.length] !== 0) {
+            // Use the bottommost row instead of the first row
+            if (table.data[table.data.length - 1][i + simplex.length] !== 0) {
                 let row = document.createElement('tr');
 
                 let nameCell = document.createElement('td');
@@ -426,11 +438,13 @@ window.solveDiet = function() {
                 row.appendChild(nameCell);
 
                 let servingsCell = document.createElement('td');
-                servingsCell.textContent = basicMat.data[0][i + simplex.length].toFixed(2);
+                // Use the bottommost row instead of the first row
+                servingsCell.textContent = table.data[table.data.length - 1][i + simplex.length].toFixed(2);
                 row.appendChild(servingsCell);
 
                 let costCell = document.createElement('td');
-                costCell.textContent = (basicMat.data[0][i + simplex.length] * foods[selectedFoods[i]].price).toFixed(3);
+                // Use the bottommost row instead of the first row
+                costCell.textContent = (table.data[table.data.length - 1][i + simplex.length] * foods[selectedFoods[i]].price).toFixed(3);
                 row.appendChild(costCell);
 
                 finalSolutionTable.appendChild(row);
