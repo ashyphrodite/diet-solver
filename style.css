@@ -13,6 +13,23 @@ body {
     background-color: #151515;
 }
 
+#guide-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-guide-text {
+    color: #bbb;
+    text-decoration: underline;
+    text-align: center;
+    cursor: pointer;
+}
+
+.user-guide-text:hover {
+    color: #eee;
+}
+
 #tableau-header {
     width: 100%;
     border-bottom: 1px solid #333;
@@ -103,7 +120,7 @@ body {
     display: none;
 }
 
-.quadspline-results-container {
+#quadspline-results-container {
     display: none;
 }
 
