@@ -168,7 +168,10 @@ window.selectAll = function() {
     for (let i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = true;
         checkboxes[i].dispatchEvent(new Event('change'));
-        selectedFoods.push(checkboxes[i].id);
+
+        if (!selectedFoods.includes(checkboxes[i].id)) {
+            selectedFoods.push(checkboxes[i].id);
+        }
     }
 }
 
